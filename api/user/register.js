@@ -11,19 +11,13 @@ export default async function Register(req,res) {
    const { uid, email, createdAt, lastLoginAt } = user;
      const ref = db.ref(`users/${uid}`)
      await ref.set({
-       profile: {
-         fullname: "-",
-         nickname: "-",
-         dob: "-",
-         bio: "-",
-         createAt: "-",
-         role: "-",
-         phone: "-"
-       },
        account: {
+         uid: uid,
          email: email,
+         role: "visitor",
          createAt: createdAt,
-         lastLoginAt: lastLoginAt
+         lastLoginAt: lastLoginAt,
+         updatedAt: new Date().toISOString()
        }
      })
      

@@ -8,17 +8,27 @@ export default async function Subscription(req, res) {
   }
   
   try {
-    const subscription = req.body;
+    const { subscription, uid } = req.body;
     
     if (!subscription) {
       return res.status(400).json({ error: 'Subscription kosong' });
     }
     
     const ref = db.ref('subscriptions');
-    await ref.push({
-     subscription,
-     subscribeAt: new Date().toISOString()
-    });
+    
+    if (uid) {
+      // 🔑 User login → simpan pakai uid
+      await ref.child(uid).set({
+        subscription,
+        subscribeAt: new Date().toISOString()
+      });
+    } else {
+      // 👤 Guest → simpan pakai random key
+      await ref.push({
+        subscription,
+        subscribeAt: new Date().toISOString()
+      });
+    }
     
     res.status(200).json({
       subscription,

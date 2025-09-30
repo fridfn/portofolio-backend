@@ -1,16 +1,17 @@
+import dotenv from 'dotenv';
 import webpush from 'web-push';
 import { db } from '../firebase/firebase-admin.js';
 import { handleCors } from "../utils/handleCors.js"
 
-const vapidKeys = {
-  publicKey: 'BG36Zp6Qg1pM7czK5qVSBOmccF87woXofKRBhI9gPM3C0rMPwlrpvaCLcovgmAGmxJXXKwEpCKWAC9IlDZQXnRg',
-  privateKey: 'U2PpAUhPIU0mAd3zQJJxVi5nV6WPxbZWQuVNGRbxk38'
-};
+dotenv.config();
+
+const vapidKeysPublic = process.env.PUBLIC_VAPID_KEY
+const vapidKeysPrivate = process.env.PRIVATE_VAPID_KEY
 
 webpush.setVapidDetails(
   'mailto:faridfathonin@email.com',
-  vapidKeys.publicKey,
-  vapidKeys.privateKey
+  vapidKeysPublic,
+  vapidKeysPrivate,
 );
 
 export default async function Notification(req, res) {
@@ -33,11 +34,28 @@ export default async function Notification(req, res) {
       icon: icon || "https://pwa-notification-phi.vercel.app/mailbox.png",
       badge: badge || "https://cdn-icons-png.flaticon.com/64/545/545782.png"
     });
-
+    
     const results = await Promise.allSettled(
-      Object.values(subs).map(sub =>
-        webpush.sendNotification(sub, payload)
-      )
+      Object.values(subs).map((sub) => {
+        const allUsers = sub.subscription;
+        
+        if (!allUsers || !allUsers.endpoint) {
+          console.warn("⚠️ Subscription invalid / kosong:", sub);
+          return Promise.resolve();
+        }
+        
+        return webpush.sendNotification(allUsers, payload).catch((err) => {
+          if (
+            err.statusCode === 404 ||
+            err.statusCode === 410
+          ) {
+            db.ref(`subscriptions/${sub}`).remove();
+            console.log("Hapus subscription invalid:", sub.id);
+          } else {
+            console.error("Error lain:", err);
+          }
+        })
+      })
     );
 
     const success = results.filter(r => r.status === 'fulfilled').length;

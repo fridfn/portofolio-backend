@@ -12,7 +12,11 @@ export default async function saveFeedback (req, res) {
     const uniqueName = feedback.name
     const uniqueTimeKey = generateKey(true)
     const ref = db.ref(`feedback/${uniqueName}/${uniqueTimeKey}`)
-    await ref.set(feedback);
+    
+    await ref.set({
+     ...feedback,
+     createAt: new Date().toISOString()
+    });
     res.status(200).json({ message: "success save feedback" })
    } catch (err) {
     console.error('Error save feedback:', err);
