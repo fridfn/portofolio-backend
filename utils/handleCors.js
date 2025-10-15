@@ -4,7 +4,8 @@ export const handleCors = (req, res) => {
     'https://localhost:5173',
     'https://cdn-icons-png.flaticon.com',
     'https://portofolio-fridfn.vercel.app',
-    'https://pwa-notification-phi.vercel.app'
+    'https://pwa-notification-phi.vercel.app',
+    'https://portofolio-fridfn-git-development-faridfns-projects.vercel.app'
   ];
   
   const origin = req.headers.origin;

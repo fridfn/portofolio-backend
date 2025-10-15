@@ -10,24 +10,25 @@ export default async function Role(req, res) {
   try {
     // 1️⃣ Ambil token Firebase dari header
     const idToken = req.headers.authorization?.split('Bearer ')[1];
+    const validRoles = ["owner", "administrator", "admin", "visitor", "user"];
     if (!idToken) {
       return res.status(401).json({ error: 'Unauthorized: no token' });
     }
-
+    
     // 2️⃣ Verifikasi token
     const decodedToken = await verifyIdToken(idToken);
     const authUid = decodedToken.uid;
 
     // 3️⃣ Ambil target uid dari URL
-    const { uid } = req.query;
-
+    const { uid } = req.params;
+    const { newRole } = req.body;
+    
     // 4️⃣ Ambil role updater dan target dari RTDB
-    const updaterSnap = await db.ref(`users/${authUid}/account/role`).once('value');
+    const updaterSnap = await db.ref(`/users/${authUid}/account/role`).once('value');
     const targetSnap = await db.ref(`users/${uid}/account/role`).once('value');
 
     const updaterRole = updaterSnap.val();
     const targetRole = targetSnap.exists() ? targetSnap.val() : null;
-    const { newRole } = req.body;
 
     if (!newRole) {
       return res.status(400).json({ error: 'newRole is required' });
@@ -43,18 +44,18 @@ export default async function Role(req, res) {
 
     // Owner rules
     else if (updaterRole === 'owner') {
-      if (!targetRole || targetRole !== 'owner') {
+      if (!targetRole || newRole !== "owner" && targetRole !== 'owner') {
         allowed = true;
       }
     }
 
     // Admin rules
     else if (updaterRole === 'administrator') {
-      if (!targetRole || (targetRole !== 'administrator' && targetRole !== 'owner')) {
+      if (newRole !== 'administrator' && newRole !== 'owner') {
         allowed = true;
       }
     }
-
+    
     if (!allowed) {
       return res.status(403).json({ error: 'Forbidden: cannot update this user role' });
     }
@@ -65,7 +66,6 @@ export default async function Role(req, res) {
     return res.status(200).json({ success: true, uid, newRole });
 
   } catch (error) {
-    console.error(error);
     return res.status(500).json({ error: 'Internal server error' });
   }
 }
