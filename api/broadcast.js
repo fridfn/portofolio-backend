@@ -10,8 +10,8 @@ export default async function Broadcast(req, res) {
   
   try {
   const broadcast = req.body;
-  const key = generateKey(true)
-    const ref = db.ref(`broadcast/${key}`);
+  const { uniqueTimeKey, year }  = generateKey(true)
+    const ref = db.ref(`broadcast/${uniqueTimeKey}`);
     await ref.set(broadcast);
     
     res.status(200).json({ message: 'broadcast berhasil disimpan!' });

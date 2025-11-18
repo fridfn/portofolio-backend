@@ -10,7 +10,7 @@ export default async function saveFeedback (req, res) {
   try {
     const feedback = req.body;
     const uniqueName = feedback.name
-    const uniqueTimeKey = generateKey(true)
+    const {uniqueTimeKey } = generateKey(true)
     const ref = db.ref(`feedback/${uniqueName}/${uniqueTimeKey}`)
     
     await ref.set({

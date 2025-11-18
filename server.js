@@ -11,6 +11,7 @@ import Message from './api/user/message.js';
 import Register from './api/user/register.js';
 import Activity from './api/user/activity.js';
 import Role from './api/user/role.js';
+import Spotify from './api/spotify.js';
 //import Role from './api/user/[uid]/role.js';
 
 dotenv.config();
@@ -21,6 +22,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post('/api/feedback', Feedback);
+app.get('/api/spotify/search', Spotify);
+app.post('/api/spotify/search', Spotify);
 app.post('/api/broadcast', Broadcast);
 app.post('/api/checkemail', Checkemail);
 app.post('/api/user/register', Register);

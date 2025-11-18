@@ -10,8 +10,10 @@ export default async function Activity (req, res) {
   
   try {
   const { uid, dataActivity } = req.body;
-  const uniqueTimeKey = generateKey(false)
-    const ref = db.ref(`users/${uid}/activity/${uniqueTimeKey}`);
+  const { uniqueTimeKey, year } = generateKey(false)
+    const ref = db.ref(`users/${uid}/activity/${year}/${uniqueTimeKey}`);
+    
+    console.log(`users/${uid}/activity/${year}/${uniqueTimeKey}`)
     
     await ref.set({
       ...dataActivity,
