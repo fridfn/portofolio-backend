@@ -111,36 +111,3 @@ export default async function Spotify(req, res) {
     return res.status(500).json({ error: err.message });
   }
 }
-
-Nov 18 22:16:15.79
-GET
-500
-pwa-notification-phi.vercel.app
-/api/spotify
-2
-🔄 Cache miss for "h", fetching from Spotify...
-Nov 18 22:16:11.80
-GET
-500
-pwa-notification-phi.vercel.app
-/api/spotify
-2
-🔄 Cache miss for "haloo", fetching from Spotify...
-Nov 18 22:16:10.67
-GET
-200
-pwa-notification-phi.vercel.app
-/api/spotify
-2
-✅ Cache hit for "to_the_bone"
-Nov 18 22:15:59.37
-GET
-200
-pwa-notification-phi.vercel.app
-/api/spotify
-2
-✅ Cache hit for "to_the_bone"
-Nov 18 22:15:52.90
-GET
-200
-pwa-notification-phi.vercel.app
