@@ -1,10 +1,15 @@
 import fetch from "node-fetch";
 import { get } from "@vercel/edge-config";
+import { handleCors } from "../utils/handleCors.js"
 
 export default async function Spotify(req, res) {
   const { q } = req.query;
-
   if (!q) return res.status(400).json({ error: "Missing query parameter 'q'" });
+  
+  if (handleCors(req, res)) return;
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
   
   try {
     const cacheKey = `${q}`;
@@ -106,3 +111,36 @@ export default async function Spotify(req, res) {
     return res.status(500).json({ error: err.message });
   }
 }
+
+Nov 18 22:16:15.79
+GET
+500
+pwa-notification-phi.vercel.app
+/api/spotify
+2
+🔄 Cache miss for "h", fetching from Spotify...
+Nov 18 22:16:11.80
+GET
+500
+pwa-notification-phi.vercel.app
+/api/spotify
+2
+🔄 Cache miss for "haloo", fetching from Spotify...
+Nov 18 22:16:10.67
+GET
+200
+pwa-notification-phi.vercel.app
+/api/spotify
+2
+✅ Cache hit for "to_the_bone"
+Nov 18 22:15:59.37
+GET
+200
+pwa-notification-phi.vercel.app
+/api/spotify
+2
+✅ Cache hit for "to_the_bone"
+Nov 18 22:15:52.90
+GET
+200
+pwa-notification-phi.vercel.app
