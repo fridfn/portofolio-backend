@@ -14,7 +14,7 @@ if (!admin.apps.length) {
 export async function verifyIdToken(idToken) {
   try {
     const decodedToken = await admin.auth().verifyIdToken(idToken);
-    return decodedToken; // berisi uid, email, etc.
+    return decodedToken; // berisi uid, email
   } catch (error) {
     throw new Error('Invalid token');
   }
