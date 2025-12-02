@@ -1,4 +1,4 @@
-import { db, verifyIdToken } from "../../firebase/firebase-admin.js"
+import { db, verifyIdToken } from "../../../firebase/firebase-admin.js"
 import { handleCors } from "../../utils/handleCors.js"
 
 export default async function Role(req, res) {
@@ -20,8 +20,7 @@ export default async function Role(req, res) {
     const authUid = decodedToken.uid;
 
     // 3️⃣ Ambil target uid dari URL
-    const { uid } = req.params;
-    const { newRole } = req.body;
+    const { newRole, uid } = req.body;
     
     // 4️⃣ Ambil role updater dan target dari RTDB
     const updaterSnap = await db.ref(`/users/${authUid}/account/role`).once('value');
@@ -41,14 +40,14 @@ export default async function Role(req, res) {
     if (authUid === uid) {
       allowed = true;
     }
-
+    
     // Owner rules
     else if (updaterRole === 'owner') {
-      if (!targetRole || newRole !== "owner" && targetRole !== 'owner') {
+      if (!targetRole || (newRole !== "owner" && targetRole !== "owner")) {
         allowed = true;
       }
     }
-
+    
     // Admin rules
     else if (updaterRole === 'administrator') {
       if (newRole !== 'administrator' && newRole !== 'owner') {
