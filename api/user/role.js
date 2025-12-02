@@ -1,4 +1,4 @@
-import { db, verifyIdToken } from "../../../firebase/firebase-admin.js"
+import { db, verifyIdToken } from "../../firebase/firebase-admin.js"
 import { handleCors } from "../../utils/handleCors.js"
 
 export default async function Role(req, res) {
