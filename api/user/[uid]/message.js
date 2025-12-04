@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import webpush from 'web-push';
-import { db, verifyIdToken } from "../../firebase/firebase-admin.js"
-import { handleCors } from "../../utils/handleCors.js"
+import { db, verifyIdToken } from "../../../firebase/firebase-admin.js"
+import { handleCors } from "../../../utils/handleCors.js"
 
 dotenv.config();
 
