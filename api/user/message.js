@@ -26,7 +26,7 @@ export default async function Message(req, res) {
       return res.status(401).json({ error: "id token Unauthorized: no token" })
     }
      
-     const { uid } = req.params;
+     const { uid } = req.body;
      const { message, icon, badge } = req.body;
      const [title, messages = ""] = message.split("-").map(str => str.trim())
      
