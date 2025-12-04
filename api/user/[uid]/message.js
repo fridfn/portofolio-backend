@@ -34,7 +34,7 @@ export default async function Message(req, res) {
      const authUid = decodedToken.uid;
      
      const senderSnap = await db.ref(`/users/${authUid}/account/role`).once("value")
-     const recepientSnap = await db.ref(`/subscriptions/${uid}`).once("value")
+     const recepientSnap = await db.ref(`/subscriptions/${targetUid}`).once("value")
      const recepientVal = recepientSnap.val()
      
      if (!recepientVal) {
