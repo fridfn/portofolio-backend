@@ -26,7 +26,7 @@ export default async function Message(req, res) {
       return res.status(401).json({ error: "id token Unauthorized: no token" })
     }
      
-     const { uid } = req.body;
+     const { targetUid } = req.body;
      const { message, icon, badge } = req.body;
      const [title, messages = ""] = message.split("-").map(str => str.trim())
      
@@ -36,8 +36,7 @@ export default async function Message(req, res) {
      const senderSnap = await db.ref(`/users/${authUid}/account/role`).once("value")
      const recepientSnap = await db.ref(`/subscriptions/${uid}`).once("value")
      const recepientVal = recepientSnap.val()
-     console.log("recepientVal : ", recepientVal)
-     console.log("senderSnap : ", senderSnap)
+     
      if (!recepientVal) {
        return res.status(404).json({ error: "Recipient not found" })
      }
