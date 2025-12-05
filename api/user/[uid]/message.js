@@ -48,13 +48,13 @@ export default async function Message(req, res) {
       badge: badge || "https://cdn-icons-png.flaticon.com/64/545/545782.png"
      });
       
-      const results = webpush.sendNotification(recepientVal.subscription, payload).catch((err) => {
+      const results = await webpush.sendNotification(recepientVal.subscription, payload).catch((err) => {
         if (
           err.statusCode === 404 ||
           err.statusCode === 410
         ) {
-          db.ref(`subscriptions/${recepientSnap}`).remove();
-          console.log("Hapus subscription invalid:", recepientSnap);
+          db.ref(`subscriptions/${targetUid}`).remove();
+          console.log("Hapus subscription invalid:", targetUid);
         } else {
           console.error("Error lain:", err);
         }
