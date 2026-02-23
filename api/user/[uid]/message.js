@@ -26,7 +26,7 @@ export default async function Message(req, res) {
       return res.status(401).json({ error: "id token Unauthorized: no token" })
     }
      
-     const { targetUid } = req.body;
+     const { targetUid, account } = req.body;
      const { message, icon, badge } = req.body;
      const [title, messages = ""] = message.split("-").map(str => str.trim())
      
@@ -43,7 +43,7 @@ export default async function Message(req, res) {
      
      const payload = JSON.stringify({
       title: title || 'Notifikasi Baru!',
-      body: messages || 'Ini pesan default dari admin 😚',
+      body: messages || `Ini pesan default dari admin ${account.email} 😚`,
       icon: icon || "https://pwa-notification-phi.vercel.app/mailbox.png",
       badge: badge || "https://cdn-icons-png.flaticon.com/64/545/545782.png"
      });

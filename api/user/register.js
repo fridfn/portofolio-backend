@@ -9,6 +9,7 @@ export default async function Register(req,res) {
    try {
    const user = req.body
    const { uid, email, createdAt, lastLoginAt, password } = user;
+   
      const ref = db.ref(`users/${uid}`)
      await ref.set({
        account: {
