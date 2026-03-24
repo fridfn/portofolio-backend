@@ -25,6 +25,9 @@ export default async function Spotify(req, res) {
     const auth = Buffer.from(
       `${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`
     ).toString("base64");
+    
+    console.log("CLIENT ID:", process.env.SPOTIFY_CLIENT_ID);
+console.log("CLIENT SECRET:", process.env.SPOTIFY_CLIENT_SECRET);
 
     const tokenRes = await fetch("https://accounts.spotify.com/api/token", {
       method: "POST",
