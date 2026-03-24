@@ -70,11 +70,24 @@ export default async function Spotify(req, res) {
       }
     );
 
-    const data = await searchRes.json();
-    if (!searchRes.ok) {
+    // const data = await searchRes.json();
+//     if (!searchRes.ok) {
+//       return res.status(500).json({
+//         error: "Spotify search failed",
+//         details: data,
+//       });
+//     }
+    
+    const rawSearch = await searchRes.text();
+    console.log("SEARCH RAW:", rawSearch);
+    
+    let data;
+    try {
+      data = JSON.parse(rawSearch);
+    } catch {
       return res.status(500).json({
-        error: "Spotify search failed",
-        details: data,
+        error: "Search response not JSON",
+        raw: rawSearch
       });
     }
     const result = {
