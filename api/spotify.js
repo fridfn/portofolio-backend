@@ -36,12 +36,28 @@ export default async function Spotify(req, res) {
       },
       body: "grant_type=client_credentials",
     });
-console.log("FINAL URL:", tokenRes.url);
-    const tokenData = await tokenRes.json();
-    if (!tokenRes.ok) {
+    
+    console.log("FINAL URL:", tokenRes.url);
+
+    // const tokenData = await tokenRes.json();
+//     if (!tokenRes.ok) {
+//       return res.status(500).json({
+//         error: "Failed to get Spotify access token",
+//         details: tokenData,
+//       });
+//     }
+    
+    
+    const raw = await tokenRes.text();
+    console.log("TOKEN RAW:", raw);
+    
+    let tokenData;
+    try {
+      tokenData = JSON.parse(raw);
+    } catch {
       return res.status(500).json({
-        error: "Failed to get Spotify access token",
-        details: tokenData,
+        error: "Spotify token response is not JSON",
+        raw
       });
     }
 
