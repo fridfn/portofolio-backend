@@ -1,3 +1,6 @@
+import { get } from "@vercel/edge-config";
+import { handleCors } from "../utils/handleCors.js";
+
 export default async function Spotify(req, res) {
   const { q, limit } = req.query;
   const parsedLimit = parseInt(limit) || 5;
