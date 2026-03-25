@@ -1,118 +1,76 @@
-import fetch from "node-fetch";
 import { get } from "@vercel/edge-config";
-import { handleCors } from "../utils/handleCors.js"
+import { handleCors } from "../utils/handleCors.js";
 
 export default async function Spotify(req, res) {
   const { q } = req.query;
   if (!q) return res.status(400).json({ error: "Missing query parameter 'q'" });
-  
+
   if (handleCors(req, res)) return;
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
   }
-  
+
   try {
     const cacheKey = `${q}`;
     const cached = await get(cacheKey);
-    console.log(cached)
+
     if (cached) {
       console.log(`✅ Cache hit for "${q}"`);
       return res.status(200).json({ ...cached, cached: true });
     }
 
-    console.log(`🔄 Cache miss for "${q}", fetching from Spotify...`);
+    console.log(`🔄 Fetching from Deezer for "${q}"...`);
 
-    const auth = Buffer.from(
-      `${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`
-    ).toString("base64");
-    
-
-    const tokenRes = await fetch("https://accounts.spotify.com/api/token", {
-      method: "POST",
-      timeout: 5000,
-      headers: {
-        Authorization: `Basic ${auth}`,
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: "grant_type=client_credentials",
-    });
-    
-    console.log("FINAL URL:", tokenRes.url);
-
-    // const tokenData = await tokenRes.json();
-//     if (!tokenRes.ok) {
-//       return res.status(500).json({
-//         error: "Failed to get Spotify access token",
-//         details: tokenData,
-//       });
-//     }
-    
-    
-    const raw = await tokenRes.text();
-    console.log("TOKEN RAW:", raw);
-    
-    let tokenData;
-    try {
-      tokenData = JSON.parse(raw);
-    } catch {
-      return res.status(500).json({
-        error: "Spotify token response is not JSON",
-        raw
-      });
-    }
-
-    const accessToken = tokenData.access_token;
-
+    // 🔥 FETCH DEEZER
     const searchRes = await fetch(
-      `https://api.spotify.com/v1/search?q=${encodeURIComponent(q)}&type=track&limit=5`,
-      {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      }
+      `https://api.deezer.com/search?q=${encodeURIComponent(q)}`
     );
 
-    // const data = await searchRes.json();
-//     if (!searchRes.ok) {
-//       return res.status(500).json({
-//         error: "Spotify search failed",
-//         details: data,
-//       });
-//     }
-    
-    const rawSearch = await searchRes.text();
-    console.log("SEARCH RAW:", rawSearch);
-    
+    const raw = await searchRes.text();
+    console.log("DEEZER RAW:", raw);
+
     let data;
     try {
-      data = JSON.parse(rawSearch);
+      data = JSON.parse(raw);
     } catch {
       return res.status(500).json({
-        error: "Search response not JSON",
-        raw: rawSearch
+        error: "Deezer response not JSON",
+        raw,
       });
     }
+
+    // 🔥 MAP KE FORMAT SPOTIFY KAMU
     const result = {
-      result: data.tracks.items.map((track) => ({
+      result: data.data.map((track) => ({
         id: track.id,
-        name: track.name,
-        album: {
-         album_type: track.album.album_type,
-         artists: track.album.artists,
-         href: track.album.href,
-         id: track.album.id,
-         images: track.album.images,
-         name: track.album.name,
-         release_date: track.album.release_date,
-         total_tracks: track.album.name,
-         type: track.album.type,
-         uri: track.album.uri,
-        },
-        artist: track.artists.map((a) => a.name).join(", "),
-        image: track.album.images[0]?.url,
-        spotify_url: track.external_urls.spotify,
-        artist_data: track.album.artists,
+        name: track.title,
+
+        // album (opsional → kalau ada)
+        ...(track.album && {
+          album: {
+            id: track.album.id,
+            name: track.album.title,
+            images: track.album.cover_medium
+              ? [{ url: track.album.cover_medium }]
+              : [],
+          },
+        }),
+
+        artist: track.artist?.name,
+
+        image: track.album?.cover_medium,
+
+        spotify_url: track.link, // 🔁 ganti ke Deezer link
+
+        artist_data: track.artist ? [track.artist] : [],
+
+        // 🔥 tambahan (opsional kalau mau dipakai nanti)
+        preview: track.preview,
+        duration: track.duration,
       })),
     };
-    // 💾 Save to Edge Config manually using REST API
+
+    // 💾 CACHE (tetap sama)
     try {
       const saveRes = await fetch(
         `${process.env.EDGE_CONFIG}/items/${cacheKey}`,
@@ -128,13 +86,14 @@ export default async function Spotify(req, res) {
 
       if (!saveRes.ok) {
         const err = await saveRes.text();
-        console.warn("⚠️ Failed to cache in Edge Config:", err);
+        console.warn("⚠️ Failed to cache:", err);
       } else {
         console.log(`💾 Cached result for "${q}"`);
       }
     } catch (cacheErr) {
       console.warn("⚠️ Cache error:", cacheErr.message);
     }
+
     return res.status(200).json({ ...result, cached: false });
   } catch (err) {
     console.error("Server error:", err);
