@@ -154,7 +154,7 @@ on:
 
 jobs:
   notify:
-    uses: fridfn/farid-workflows/.github/workflows/telegram.yml@main
+    uses: fridfn/workflow-development/.github/workflows/telegram.yml@main
     with:
       private_message: |
         💜 Repo: ${{ github.repository }}
