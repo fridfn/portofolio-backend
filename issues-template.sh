@@ -143,8 +143,6 @@ echo "=============================================================="
 
 echo  "🚀 Setting up folder workflows..."
 
-mkdir -p .github/workflows
-
 # ========================
 # FOR TELEGRAM NOTIFY
 # ========================
@@ -156,12 +154,20 @@ on:
 
 jobs:
   notify:
-    uses: fridfn/workflow-development/.github/workflows/telegram.yml@main
+    uses: fridfn/farid-workflows/.github/workflows/telegram.yml@main
     with:
-      message: "🚀 ${{ github.repository }} ada update!"
+      private_message: |
+        💜 Repo: ${{ github.repository }}
+        👤 Author: ${{ github.actor }}
+        📝 Commit: ${{ github.event.head_commit.message }}
+
+      channel_message: |
+        🚀 Update baru di ${{ github.repository }}
+
     secrets:
       TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
       TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
 EOF
 
 echo "✅ Done! Folder workflow berhasil dibuat di .github/workflows"
