@@ -1,0 +1,13 @@
+name: Notify
+
+on:
+  push:
+
+jobs:
+  notify:
+    uses: fridfn/workflow-development/.github/workflows/telegram.yml@main
+    with:
+      message: "🚀 ${{ github.repository }} ada update!"
+    secrets:
+      TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}

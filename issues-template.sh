@@ -143,6 +143,8 @@ echo "=============================================================="
 
 echo  "🚀 Setting up folder workflows..."
 
+mkdir -p .github/workflows
+
 # ========================
 # FOR TELEGRAM NOTIFY
 # ========================
